@@ -1,6 +1,6 @@
 "use server";
 
-import { adminDb } from "@/lib/firebase-admin";
+import { getAdminDb } from "@/lib/firebase-admin";
 import { revalidatePath } from "next/cache";
 
 export type QuotationStatus = 'pending' | 'viewed' | 'quoted' | 'rejected' | 'completed';
@@ -18,23 +18,23 @@ export type Quotation = {
 };
 
 export async function getQuotations() {
-    const snapshot = await adminDb.collection("quotations").orderBy("createdAt", "desc").get();
+    const snapshot = await getAdminDb().collection("quotations").orderBy("createdAt", "desc").get();
     return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Quotation));
 }
 
 export async function getQuotation(id: string) {
-    const doc = await adminDb.collection("quotations").doc(id).get();
+    const doc = await getAdminDb().collection("quotations").doc(id).get();
     if (!doc.exists) return null;
     return { id: doc.id, ...doc.data() } as Quotation;
 }
 
 export async function updateQuotationStatus(id: string, status: QuotationStatus) {
-    await adminDb.collection("quotations").doc(id).update({ status });
+    await getAdminDb().collection("quotations").doc(id).update({ status });
     revalidatePath("/admin/quotations");
     revalidatePath(`/admin/quotations/${id}`);
 }
 
 export async function updateQuotationNotes(id: string, adminNotes: string) {
-    await adminDb.collection("quotations").doc(id).update({ adminNotes });
+    await getAdminDb().collection("quotations").doc(id).update({ adminNotes });
     revalidatePath(`/admin/quotations/${id}`);
 }

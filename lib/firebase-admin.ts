@@ -26,8 +26,13 @@ export function createFirebaseAdminApp() {
     });
 }
 
-const adminApp = createFirebaseAdminApp();
-const adminDb = getFirestore(adminApp);
-const adminAuth = getAuth(adminApp);
+export function getAdminDb() {
+    const app = createFirebaseAdminApp();
+    return getFirestore(app);
+}
 
-export { adminDb, adminAuth };
+export function getAdminAuth() {
+    const app = createFirebaseAdminApp();
+    return getAuth(app);
+}
+

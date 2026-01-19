@@ -1,6 +1,6 @@
 "use server";
 
-import { adminDb } from "@/lib/firebase-admin";
+import { getAdminDb } from "@/lib/firebase-admin";
 import { revalidatePath } from "next/cache";
 
 export type LocalizedText = {
@@ -48,7 +48,7 @@ export type Product = {
 };
 
 export async function getProducts() {
-    const snapshot = await adminDb.collection("products").orderBy("createdAt", "desc").get();
+    const snapshot = await getAdminDb().collection("products").orderBy("createdAt", "desc").get();
     return snapshot.docs.map((doc) => {
         const data = doc.data();
         // Helper to ensure data structure compatibility
@@ -60,7 +60,7 @@ export async function getProducts() {
 }
 
 export async function getProduct(id: string) {
-    const doc = await adminDb.collection("products").doc(id).get();
+    const doc = await getAdminDb().collection("products").doc(id).get();
     if (!doc.exists) return null;
     const data = doc.data()!;
 
@@ -73,12 +73,12 @@ export async function getProduct(id: string) {
 
 export async function createProduct(data: Omit<Product, "id" | "createdAt">) {
     // Validate Slug
-    const slugCheck = await adminDb.collection("products").where("slug", "==", data.slug).get();
+    const slugCheck = await getAdminDb().collection("products").where("slug", "==", data.slug).get();
     if (!slugCheck.empty) {
         throw new Error("Slug already exists");
     }
 
-    const docRef = await adminDb.collection("products").add({
+    const docRef = await getAdminDb().collection("products").add({
         ...data,
         createdAt: new Date().toISOString(),
     });
@@ -89,17 +89,17 @@ export async function createProduct(data: Omit<Product, "id" | "createdAt">) {
 
 export async function updateProduct(id: string, data: Partial<Product>) {
     if (data.slug) {
-        const slugCheck = await adminDb.collection("products").where("slug", "==", data.slug).get();
+        const slugCheck = await getAdminDb().collection("products").where("slug", "==", data.slug).get();
         if (!slugCheck.empty && slugCheck.docs[0].id !== id) {
             throw new Error("Slug already exists");
         }
     }
 
-    await adminDb.collection("products").doc(id).update(data);
+    await getAdminDb().collection("products").doc(id).update(data);
     revalidatePath("/admin/products");
 }
 
 export async function deleteProduct(id: string) {
-    await adminDb.collection("products").doc(id).delete();
+    await getAdminDb().collection("products").doc(id).delete();
     revalidatePath("/admin/products");
 }

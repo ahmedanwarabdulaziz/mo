@@ -1,0 +1,10 @@
+{
+    "HomePage": {
+        "title": "Welcome to MO3D",
+        "subtitle": "Your destination for premium 3D printing solutions"
+    },
+    "Common": {
+        "viewProduct": "View Product",
+        "addToCart": "Add to Cart"
+    }
+}

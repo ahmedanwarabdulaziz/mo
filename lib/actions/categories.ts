@@ -1,6 +1,6 @@
 "use server";
 
-import { adminDb } from "@/lib/firebase-admin";
+import { getAdminDb } from "@/lib/firebase-admin";
 import { revalidatePath } from "next/cache";
 
 export type LocalizedText = {
@@ -21,7 +21,7 @@ export type Category = {
 };
 
 export async function getCategories() {
-    const snapshot = await adminDb.collection("categories").orderBy("createdAt", "desc").get();
+    const snapshot = await getAdminDb().collection("categories").orderBy("createdAt", "desc").get();
     return snapshot.docs.map((doc) => {
         const data = doc.data();
         // Helper to ensure data structure compatibility if migrating
@@ -38,7 +38,7 @@ export async function getCategories() {
 }
 
 export async function getCategory(id: string) {
-    const doc = await adminDb.collection("categories").doc(id).get();
+    const doc = await getAdminDb().collection("categories").doc(id).get();
     if (!doc.exists) return null;
     const data = doc.data()!;
 
@@ -51,12 +51,12 @@ export async function getCategory(id: string) {
 
 export async function createCategory(data: Omit<Category, "id" | "createdAt">) {
     // Validate Slug Uniqueness
-    const slugCheck = await adminDb.collection("categories").where("slug", "==", data.slug).get();
+    const slugCheck = await getAdminDb().collection("categories").where("slug", "==", data.slug).get();
     if (!slugCheck.empty) {
         throw new Error("Slug already exists");
     }
 
-    const docRef = await adminDb.collection("categories").add({
+    const docRef = await getAdminDb().collection("categories").add({
         ...data,
         createdAt: new Date().toISOString(),
     });
@@ -68,24 +68,24 @@ export async function createCategory(data: Omit<Category, "id" | "createdAt">) {
 export async function updateCategory(id: string, data: Partial<Category>) {
     // Check slug if it's being changed
     if (data.slug) {
-        const slugCheck = await adminDb.collection("categories").where("slug", "==", data.slug).get();
+        const slugCheck = await getAdminDb().collection("categories").where("slug", "==", data.slug).get();
         if (!slugCheck.empty && slugCheck.docs[0].id !== id) {
             throw new Error("Slug already exists");
         }
     }
 
-    await adminDb.collection("categories").doc(id).update(data);
+    await getAdminDb().collection("categories").doc(id).update(data);
     revalidatePath("/admin/categories");
     revalidatePath(`/admin/categories/${id}`);
 }
 
 export async function deleteCategory(id: string) {
     // Check for subcategories
-    const subcats = await adminDb.collection("categories").where("parentId", "==", id).get();
+    const subcats = await getAdminDb().collection("categories").where("parentId", "==", id).get();
     if (!subcats.empty) {
         throw new Error("Cannot delete category with subcategories");
     }
 
-    await adminDb.collection("categories").doc(id).delete();
+    await getAdminDb().collection("categories").doc(id).delete();
     revalidatePath("/admin/categories");
 }
