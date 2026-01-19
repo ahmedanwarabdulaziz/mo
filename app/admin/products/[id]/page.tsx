@@ -3,6 +3,9 @@ import { getCategories } from "@/lib/actions/categories";
 import { getProduct } from "@/lib/actions/products";
 import { notFound } from "next/navigation";
 
+export const dynamic = 'force-dynamic';
+
+
 interface PageProps {
     params: {
         id: string;

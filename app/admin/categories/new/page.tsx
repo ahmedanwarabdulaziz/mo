@@ -1,6 +1,9 @@
 import CategoryForm from "@/components/admin/category-form";
 import { getCategories } from "@/lib/actions/categories";
 
+export const dynamic = 'force-dynamic';
+
+
 export default async function NewCategoryPage() {
     const categories = await getCategories();
 

@@ -2,6 +2,9 @@ import CategoryForm from "@/components/admin/category-form";
 import { getCategories, getCategory } from "@/lib/actions/categories";
 import { notFound } from "next/navigation";
 
+export const dynamic = 'force-dynamic';
+
+
 interface PageProps {
     params: {
         id: string;

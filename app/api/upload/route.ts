@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { r2Client, R2_BUCKET_NAME, R2_PUBLIC_URL } from "@/lib/storage";
+import { getR2Client, R2_BUCKET_NAME, R2_PUBLIC_URL } from "@/lib/storage";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 import { decrypt } from "@/lib/auth";
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
         const fileName = `uploads/${uuidv4()}.${fileExtension}`;
 
         // 2. Upload to R2
-        await r2Client.send(
+        await getR2Client().send(
             new PutObjectCommand({
                 Bucket: R2_BUCKET_NAME,
                 Key: fileName,
