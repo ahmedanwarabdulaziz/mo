@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import createMiddleware from 'next-intl/middleware';
 import { jwtVerify } from "jose";
 
 const SECRET_KEY = "mo3d-super-secret-key-change-this-in-prod";
@@ -13,16 +12,13 @@ async function decrypt(input: string): Promise<Record<string, unknown>> {
     return payload;
 }
 
-const intlMiddleware = createMiddleware({
-    locales: ['en', 'ar'],
-    defaultLocale: 'en'
-});
-
 export async function middleware(request: NextRequest) {
+    const { pathname } = request.nextUrl;
+
     // 1. Handle Admin Routes (Auth Protection, No i18n routing)
-    if (request.nextUrl.pathname.startsWith("/admin")) {
+    if (pathname.startsWith("/admin")) {
         // Allow access to login page and logout API
-        if (request.nextUrl.pathname === "/admin/login" || request.nextUrl.pathname.startsWith("/api/")) {
+        if (pathname === "/admin/login" || pathname.startsWith("/api/")) {
             return NextResponse.next();
         }
 
@@ -40,19 +36,32 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    // 2. Handle Public Routes (i18n Routing)
-    // Exclude API routes and public files from i18n middleware
-    if (
-        request.nextUrl.pathname.startsWith("/api") ||
-        request.nextUrl.pathname.includes(".") // Files like robots.txt, favicon.ico
-    ) {
+    // 2. Handle API routes - pass through
+    if (pathname.startsWith("/api")) {
         return NextResponse.next();
     }
 
-    return intlMiddleware(request);
+    // 3. Handle static files - pass through
+    if (pathname.includes(".")) {
+        return NextResponse.next();
+    }
+
+    // 4. Simple locale handling - manual redirect to /en if no locale
+    const locales = ['en', 'ar'];
+    const pathnameHasLocale = locales.some(
+        (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+    );
+
+    if (!pathnameHasLocale) {
+        // Redirect to /en for any path without a locale
+        const url = new URL(`/en${pathname}`, request.url);
+        url.search = request.nextUrl.search;
+        return NextResponse.redirect(url);
+    }
+
+    return NextResponse.next();
 }
 
 export const config = {
-    // Matcher: Admin routes AND Internationalized routes
-    matcher: ['/((?!_next|.*\\..*).*)']
+    matcher: ['/((?!_next|.*\\..*).*)', '/']
 };
