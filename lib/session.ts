@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { encrypt, decrypt } from "./auth-stateless";
+import { encrypt, decrypt } from "@/lib/auth-stateless";
 
 export { encrypt, decrypt };
 

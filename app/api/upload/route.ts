@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getR2Client, R2_BUCKET_NAME, R2_PUBLIC_URL } from "@/lib/storage";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
-import { decrypt } from "@/lib/auth";
+import { decrypt } from "@/lib/auth-stateless";
 
 export async function POST(request: NextRequest) {
     // 1. Verify Auth
