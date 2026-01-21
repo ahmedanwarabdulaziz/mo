@@ -11,7 +11,13 @@ export async function POST(request: NextRequest) {
         const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
         const session = await encrypt({ user: "admin", expires });
 
-        cookies().set("admin_session", session, { expires, httpOnly: true });
+        cookies().set("admin_session", session, {
+            expires,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/'
+        });
 
         return NextResponse.json({ success: true });
     }
