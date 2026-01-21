@@ -14,12 +14,18 @@ export default getRequestConfig(async ({ requestLocale }) => {
     }
 
     let messages;
+    // Static imports to ensure bundling in Vercel Edge Runtime
+    // This avoids "module not found" errors caused by dynamic variables in paths
+
     try {
-        // Messages are now inside i18n/messages
-        messages = (await import(`./messages/${locale}.json`)).default;
+        if (locale === 'ar') {
+            messages = (await import('./messages/ar.json')).default;
+        } else {
+            messages = (await import('./messages/en.json')).default;
+        }
     } catch (error) {
-        // Fallback to English if the locale file fails to load
-        messages = (await import(`./messages/en.json`)).default;
+        console.error("Failed to load messages:", error);
+        messages = (await import('./messages/en.json')).default;
     }
 
     return {
