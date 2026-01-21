@@ -14,6 +14,10 @@ const geistMono = localFont({
     weight: "100 900",
 });
 
+export function generateStaticParams() {
+    return [{ locale: 'en' }, { locale: 'ar' }];
+}
+
 export default async function LocaleLayout({
     children,
     params: { locale }
