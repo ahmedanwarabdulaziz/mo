@@ -1,0 +1,12 @@
+{
+    "common": {
+        "welcome": "Welcome to MO3D",
+        "description": "Your application is now live!",
+        "goToAdmin": "Go to Admin Panel",
+        "switchLanguage": "العربية"
+    },
+    "home": {
+        "title": "Welcome to MO3D",
+        "subtitle": "Manage your products and categories with ease"
+    }
+}

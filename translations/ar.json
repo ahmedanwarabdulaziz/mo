@@ -1,0 +1,12 @@
+{
+    "common": {
+        "welcome": "مرحباً بك في MO3D",
+        "description": "التطبيق الخاص بك يعمل الآن!",
+        "goToAdmin": "الذهاب إلى لوحة الإدارة",
+        "switchLanguage": "English"
+    },
+    "home": {
+        "title": "مرحباً بك في MO3D",
+        "subtitle": "إدارة منتجاتك وفئاتك بسهولة"
+    }
+}
