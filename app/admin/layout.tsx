@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import "../globals.css"; // Go up one level to app/globals.css
+import "../globals.css";
 import AdminShell from "@/components/admin/admin-shell";
 
 const geistSans = localFont({
-    src: "../fonts/GeistVF.woff", // Adjust path
+    src: "../fonts/GeistVF.woff",
     variable: "--font-geist-sans",
     weight: "100 900",
 });
 const geistMono = localFont({
-    src: "../fonts/GeistMonoVF.woff", // Adjust path
+    src: "../fonts/GeistMonoVF.woff",
     variable: "--font-geist-mono",
     weight: "100 900",
 });
@@ -24,6 +24,9 @@ export default function AdminLayout({
 }: {
     children: React.ReactNode;
 }) {
+    // Auth protection is handled by AdminShell component (client-side)
+    // This provides better UX with redirects and maintains session state
+
     return (
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
