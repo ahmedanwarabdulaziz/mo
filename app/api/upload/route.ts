@@ -7,8 +7,25 @@ import { decrypt } from "@/lib/auth-stateless";
 export async function POST(request: NextRequest) {
     // 1. Verify Auth
     const cookie = request.cookies.get("admin_session")?.value;
-    if (!cookie) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    try { await decrypt(cookie); } catch { return NextResponse.json({ error: "Unauthorized" }, { status: 401 }); }
+
+    console.log("Upload auth check:", {
+        hasCookie: !!cookie,
+        cookieLength: cookie?.length,
+        allCookies: request.cookies.getAll().map(c => c.name)
+    });
+
+    if (!cookie) {
+        console.error("No admin_session cookie found");
+        return NextResponse.json({ error: "Unauthorized - No session cookie" }, { status: 401 });
+    }
+
+    try {
+        await decrypt(cookie);
+        console.log("Auth successful");
+    } catch (e) {
+        console.error("Auth failed:", e);
+        return NextResponse.json({ error: "Unauthorized - Invalid session" }, { status: 401 });
+    }
 
     try {
         const formData = await request.formData();
