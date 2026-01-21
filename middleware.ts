@@ -1,7 +1,17 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import createMiddleware from 'next-intl/middleware';
-import { decrypt } from "@/lib/auth-stateless";
+import { jwtVerify } from "jose";
+
+const SECRET_KEY = "mo3d-super-secret-key-change-this-in-prod";
+const key = new TextEncoder().encode(SECRET_KEY);
+
+async function decrypt(input: string): Promise<Record<string, unknown>> {
+    const { payload } = await jwtVerify(input, key, {
+        algorithms: ["HS256"],
+    });
+    return payload;
+}
 
 const intlMiddleware = createMiddleware({
     locales: ['en', 'ar'],
